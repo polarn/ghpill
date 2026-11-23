@@ -1,0 +1,20 @@
+{
+  "custom/github#work": {
+    "format": "\uf09b {text}",
+    "hide-empty-text": true,
+    "restart-interval": 1,
+    "return-type": "json",
+    "exec": "ghpill --interval 60 --scope=work --work-owners=acme-io,acme-internal --apply-repo=acme-internal/terraform --release-repos=acme-internal/api,acme-internal/web --hide-empty",
+    "on-click": "ghpill --open --scope=work --hide-titles='Sync labels'",
+    "on-click-right": "ghpill --open --scope=work"
+  },
+  "custom/github#personal": {
+    "format": "\uf015 {text}",
+    "hide-empty-text": true,
+    "restart-interval": 1,
+    "return-type": "json",
+    "exec": "ghpill --interval 120 --scope=personal --work-owners=acme-io,acme-internal --runs=false --hide-empty",
+    "on-click": "ghpill --open --scope=personal",
+    "on-click-right": "ghpill --open --scope=personal"
+  }
+}

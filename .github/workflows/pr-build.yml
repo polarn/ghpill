@@ -1,0 +1,50 @@
+name: PR Build
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    name: Build Snapshot Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: stable
+
+      - name: Run GoReleaser Snapshot
+        uses: goreleaser/goreleaser-action@v7
+        with:
+          version: "~> v2"
+          args: release --snapshot --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AUR_KEY: unused
+          HOMEBREW_TAP_GITHUB_TOKEN: unused
+
+      - name: Upload Archives
+        uses: actions/upload-artifact@v7
+        with:
+          name: archives
+          path: dist/*.tar.gz
+          retention-days: 30
+
+      - name: Upload Package Definitions
+        uses: actions/upload-artifact@v7
+        with:
+          name: package-definitions
+          path: |
+            dist/aur/
+            dist/homebrew/
+          retention-days: 30

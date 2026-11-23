@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+
+version: 2
+
+before:
+  hooks:
+    - go mod tidy -diff
+
+builds:
+  - id: ghpill
+    binary: ghpill
+    main: ./cmd/ghpill
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.ShortCommit}}
+
+archives:
+  - formats: [tar.gz]
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else }}{{ .Arch }}{{ end }}
+    files:
+      - README.md
+      - LICENSE
+      - examples/**/*
+
+changelog:
+  use: github-native
+
+aurs:
+  - name: ghpill-bin
+    license: Apache-2.0
+    private_key: "{{ .Env.AUR_KEY }}"
+    git_url: "ssh://aur@aur.archlinux.org/ghpill-bin.git"
+    homepage: "https://github.com/polarn/ghpill"
+    description: "GitHub pull requests, reviews and workflow runs as a Waybar pill with a fuzzel picker"
+    maintainers:
+      - "Marcus Johansson <polarn@polarn.net>"
+    provides:
+      - ghpill
+    conflicts:
+      - ghpill
+    depends:
+      - github-cli
+    optdepends:
+      - "waybar: the bar that shows the pill"
+      - "fuzzel: the picker behind a click"
+      - "libnotify: desktop notifications"
+      - "xdg-utils: opening pages in the browser"
+      - "ttf-nerd-fonts-symbols: the glyphs"
+    package: |-
+      install -Dm755 "./ghpill" "${pkgdir}/usr/bin/ghpill"
+      install -Dm644 "./LICENSE" "${pkgdir}/usr/share/licenses/ghpill-bin/LICENSE"
+      install -Dm644 "./README.md" "${pkgdir}/usr/share/doc/ghpill/README.md"
+      install -Dm644 "./examples/waybar/github.jsonc" "${pkgdir}/usr/share/doc/ghpill/examples/waybar/github.jsonc"
+      install -Dm644 "./examples/waybar/style.css" "${pkgdir}/usr/share/doc/ghpill/examples/waybar/style.css"
+
+homebrew_casks:
+  - name: ghpill
+    repository:
+      owner: polarn
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    directory: Casks
+    homepage: "https://github.com/polarn/ghpill"
+    description: "GitHub pull requests, reviews and workflow runs as a SwiftBar menu bar item"
+    dependencies:
+      - formula: gh
+    hooks:
+      post:
+        install_steps: |
+          on_macos do
+            run "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "{{ .StagedPath }}/ghpill"], must_succeed: false
+          end

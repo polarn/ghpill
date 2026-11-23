@@ -1,0 +1,38 @@
+/* Colours for the ghpill classes (Catppuccin Macchiato). Several classes can
+ * apply at once and the last matching rule wins, so the order below is the
+ * precedence: queued < running < pending < review < approval < dequeued < failed. */
+
+@define-color lavender #b7bdf8;
+@define-color green #a6da95;
+@define-color yellow #eed49f;
+@define-color peach #f5a97f;
+@define-color mauve #c6a0f6;
+@define-color red #ed8796;
+
+#custom-github.queued {
+    color: @lavender;
+}
+
+#custom-github.running {
+    color: @green;
+}
+
+#custom-github.pending {
+    color: @yellow;
+}
+
+#custom-github.review {
+    color: @peach;
+}
+
+#custom-github.approval {
+    color: @mauve;
+}
+
+#custom-github.dequeued {
+    color: @red;
+}
+
+#custom-github.failed {
+    color: @red;
+}
